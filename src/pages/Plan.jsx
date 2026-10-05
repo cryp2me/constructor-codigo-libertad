@@ -1,10 +1,10 @@
 import {
   CalendarRange as CalendarRangeIcon,
   Table as TableIcon,
-  ArrowRight as ArrowRightIcon,
+  ExternalLink as ExternalLinkIcon,
   CalendarDays as CalendarDaysIcon,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { PLAN_LINKS } from "@/lib/constants";
 
 export default function Plan() {
   return (
@@ -18,13 +18,15 @@ export default function Plan() {
           Tu plan del mes
         </h1>
         <p className="mt-2 text-muted-foreground">
-          El Excel de contenido y el calendario visual viven en el Paso 4. Aquí
-          tendrás acceso directo cuando estén listos.
+          Acceso directo a tu Excel de contenido y a tu calendario del mes en
+          Google Sheets.
         </p>
       </div>
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
-        <Link
-          to="/paso-4"
+        <a
+          href={PLAN_LINKS.excel}
+          target="_blank"
+          rel="noopener noreferrer"
           className="group rounded-2xl border border-border bg-card p-6 transition-all hover:border-lima/40"
         >
           <TableIcon className="h-6 w-6 text-lima" />
@@ -35,12 +37,14 @@ export default function Plan() {
             Todas tus piezas en una sola tabla editable.
           </p>
           <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-lima">
-            {"Ir al Paso 4 "}
-            <ArrowRightIcon className="h-4 w-4" />
+            {"Abrir Excel "}
+            <ExternalLinkIcon className="h-4 w-4" />
           </span>
-        </Link>
-        <Link
-          to="/paso-4"
+        </a>
+        <a
+          href={PLAN_LINKS.calendario}
+          target="_blank"
+          rel="noopener noreferrer"
           className="group rounded-2xl border border-border bg-card p-6 transition-all hover:border-lima/40"
         >
           <CalendarDaysIcon className="h-6 w-6 text-lima" />
@@ -48,13 +52,13 @@ export default function Plan() {
             Calendario visual
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Arrastra y suelta tus piezas en el mes.
+            Qué se publica cada día del mes.
           </p>
           <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-lima">
-            {"Ir al Paso 4 "}
-            <ArrowRightIcon className="h-4 w-4" />
+            {"Abrir calendario "}
+            <ExternalLinkIcon className="h-4 w-4" />
           </span>
-        </Link>
+        </a>
       </div>
     </div>
   );

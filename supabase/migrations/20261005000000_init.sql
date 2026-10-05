@@ -3,11 +3,9 @@
 -- envíe y no tengan columna propia se guardan en `extra` (jsonb), así
 -- añadir un campo nuevo en la UI nunca rompe un insert.
 
-create extension if not exists pgcrypto;
-
 -- Trigger común: mantiene updated_date al día
 create or replace function public.touch_updated_date()
-returns trigger language plpgsql as $$
+returns trigger language plpgsql set search_path = '' as $$
 begin
   new.updated_date = now();
   return new;
@@ -93,7 +91,7 @@ begin
   foreach t in array array['user_settings','brand_profiles','content_pieces','resources','step_progress','monthly_archives'] loop
     execute format('create trigger %I_touch before update on public.%I for each row execute function public.touch_updated_date()', t, t);
     execute format('alter table public.%I enable row level security', t);
-    execute format('create policy "own rows" on public.%I for all to authenticated using (user_id = auth.uid()) with check (user_id = auth.uid())', t);
+    execute format('create policy "own rows" on public.%I for all to authenticated using (user_id = (select auth.uid())) with check (user_id = (select auth.uid()))', t);
   end loop;
 end $$;
 
@@ -107,8 +105,8 @@ insert into storage.buckets (id, name, public) values ('brand-files', 'brand-fil
 on conflict (id) do nothing;
 
 create policy "brand-files own folder read" on storage.objects for select to authenticated
-  using (bucket_id = 'brand-files' and (storage.foldername(name))[1] = auth.uid()::text);
+  using (bucket_id = 'brand-files' and (storage.foldername(name))[1] = (select auth.uid())::text);
 create policy "brand-files own folder write" on storage.objects for insert to authenticated
-  with check (bucket_id = 'brand-files' and (storage.foldername(name))[1] = auth.uid()::text);
+  with check (bucket_id = 'brand-files' and (storage.foldername(name))[1] = (select auth.uid())::text);
 create policy "brand-files own folder delete" on storage.objects for delete to authenticated
-  using (bucket_id = 'brand-files' and (storage.foldername(name))[1] = auth.uid()::text);
+  using (bucket_id = 'brand-files' and (storage.foldername(name))[1] = (select auth.uid())::text);
