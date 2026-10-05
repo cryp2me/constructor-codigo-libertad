@@ -1,33 +1,29 @@
 import { useEffect, useState } from "react";
 import { Check, Sparkles } from "lucide-react";
 import { supabase } from "@/api/client";
+import { AI_MODELS, DEFAULT_AI_MODEL } from "@/lib/aiModels";
 
-const PROVIDERS = [
-  { id: "anthropic", label: "Claude", sub: "Anthropic" },
-  { id: "openai", label: "ChatGPT", sub: "OpenAI" },
-];
-
-// Motor de IA que usan aiMarca y aiCarrusel para este usuario.
+// Modelo de IA (vía OpenRouter) que usan aiMarca y aiCarrusel para este usuario.
 export default function AiProviderSetting() {
-  const [provider, setProvider] = useState(null);
+  const [model, setModel] = useState(null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     supabase
       .from("user_settings")
-      .select("ai_provider")
+      .select("ai_model")
       .maybeSingle()
-      .then(({ data }) => setProvider(data?.ai_provider || "anthropic"));
+      .then(({ data }) => setModel(data?.ai_model || DEFAULT_AI_MODEL));
   }, []);
 
   const choose = async (id) => {
     setSaving(true);
-    const prev = provider;
-    setProvider(id);
-    const { error } = await supabase.from("user_settings").upsert({ ai_provider: id });
+    const prev = model;
+    setModel(id);
+    const { error } = await supabase.from("user_settings").upsert({ ai_model: id });
     if (error) {
-      setProvider(prev);
-      alert("No se pudo guardar el motor de IA.");
+      setModel(prev);
+      alert("No se pudo guardar el modelo de IA.");
     }
     setSaving(false);
   };
@@ -41,20 +37,22 @@ export default function AiProviderSetting() {
         Elige qué IA escribe tus carruseles y define tu marca. Puedes cambiarlo cuando quieras.
       </p>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        {PROVIDERS.map((p) => (
+        {AI_MODELS.map((m) => (
           <button
-            key={p.id}
-            disabled={saving || provider === null}
-            onClick={() => choose(p.id)}
+            key={m.id}
+            disabled={saving || model === null}
+            onClick={() => choose(m.id)}
             className={`flex items-center justify-between rounded-xl border px-4 py-3 text-left transition-colors ${
-              provider === p.id ? "border-lima bg-lima/10" : "border-border hover:bg-secondary"
+              model === m.id ? "border-lima bg-lima/10" : "border-border hover:bg-secondary"
             }`}
           >
             <span>
-              <span className="block text-sm font-semibold">{p.label}</span>
-              <span className="block text-xs text-muted-foreground">{p.sub}</span>
+              <span className="block text-sm font-semibold">{m.label}</span>
+              <span className="block text-xs text-muted-foreground">
+                {m.sub} · {m.cost}/carrusel
+              </span>
             </span>
-            {provider === p.id && <Check className="h-4 w-4 text-lima" />}
+            {model === m.id && <Check className="h-4 w-4 shrink-0 text-lima" />}
           </button>
         ))}
       </div>

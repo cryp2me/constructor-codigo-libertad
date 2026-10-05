@@ -1,5 +1,5 @@
 import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2";
-import { defaultProvider, type Provider } from "./llm.ts";
+import { resolveModel } from "./models.ts";
 
 // Cliente con el JWT del usuario: RLS garantiza que solo lee sus filas.
 export async function userContext(req: Request) {
@@ -13,11 +13,10 @@ export async function userContext(req: Request) {
 
   const [{ data: brand }, { data: settings }] = await Promise.all([
     supabase.from("brand_profiles").select("*").order("created_date").limit(1).maybeSingle(),
-    supabase.from("user_settings").select("ai_provider").maybeSingle(),
+    supabase.from("user_settings").select("ai_model").maybeSingle(),
   ]);
 
-  const provider: Provider = (settings?.ai_provider as Provider) ?? defaultProvider();
-  return { user, brand: brand ?? null, provider };
+  return { user, brand: brand ?? null, model: resolveModel(settings?.ai_model) };
 }
 
 const list = (v: unknown) =>

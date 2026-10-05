@@ -1,7 +1,7 @@
 # Constructor CVM · Código Libertad
 
 Clon de **Constructor CVM** (https://libertad-content-lab.base44.app) sin dependencia de Base44:
-frontend Vite + React + Tailwind y backend en **Supabase** con IA intercambiable (**Claude o ChatGPT**).
+frontend Vite + React + Tailwind y backend en **Supabase** e IA vía **OpenRouter** (Claude, GPT, Gemini, Grok o DeepSeek, a elección de cada usuario).
 
 ![Inicio](docs/preview-inicio.png)
 
@@ -34,13 +34,14 @@ Todas leen el **perfil de marca del usuario en el servidor** y lo inyectan en el
 palabras prohibidas, CTAs, productos, colores, tipografías). Los prompts se reconstruyeron a partir de pruebas
 contra la app original y viven en `supabase/functions/*/index.ts`: edítalos ahí para afinar la calidad.
 
-### Claude o ChatGPT
+### IA vía OpenRouter
 
-- Cada usuario elige en **Ajustes → Motor de IA** (tabla `user_settings`).
-- Sin elección, se usa el secreto `AI_PROVIDER` (`anthropic` por defecto).
-- Ambos proveedores reciben el mismo prompt y el mismo JSON Schema estricto, así que la UI no cambia.
-- Modelos configurables por secreto: `ANTHROPIC_MODEL` (por defecto `claude-opus-5-5`) y `OPENAI_MODEL` (por defecto `gpt-4o`).
-- Con Claude está activado el *fallback* del servidor: si el modelo rechaza una petición, Anthropic la reintenta con otro modelo automáticamente.
+- Una sola clave (`OPENROUTER_API_KEY`) da acceso a todos los modelos.
+- Cada usuario elige modelo en **Ajustes → Motor de IA** (`user_settings.ai_model`).
+- El servidor solo acepta los modelos de `supabase/functions/_shared/models.ts` (sincronizado con `src/lib/aiModels.js`), para que nadie elija desde el navegador un modelo desorbitado.
+- Por defecto `anthropic/claude-opus-5.5`; se cambia con el secreto `OPENROUTER_MODEL`.
+- Salida JSON estricta (`response_format: json_schema`), enrutado solo a proveedores que la respetan, más validación y un reintento.
+- Preparado para que cada usuario conecte su propia cuenta de OpenRouter (OAuth): basta con que `apiKeyFor()` en `_shared/llm.ts` devuelva la clave del usuario.
 
 ## Puesta en marcha
 
@@ -54,11 +55,10 @@ contra la app original y viven en `supabase/functions/*/index.ts`: edítalos ah�
    ```
 3. **Secretos** (Dashboard → Edge Functions → Secrets, o CLI):
    ```bash
-   supabase secrets set ANTHROPIC_API_KEY=... OPENAI_API_KEY=... AI_PROVIDER=anthropic
+   supabase secrets set OPENROUTER_API_KEY=...
    ```
-   Solo hace falta la clave del proveedor que vayas a usar.
 4. **Auth**:
-   - Authentication → URL Configuration: añade tu dominio y `http://localhost:5173` a *Redirect URLs*.
+   - Authentication → URL Configuration: pon tu dominio en *Site URL* (si no, los emails de confirmación apuntan a `localhost:3000`) y añade `http://localhost:5173` a *Redirect URLs*.
    - Authentication → Email Templates → *Confirm signup*: incluye `{{ .Token }}` para que el registro envíe un código de 6 dígitos (la pantalla de registro lo pide).
    - Opcional: activa Google en Authentication → Providers.
 5. **Frontend**:

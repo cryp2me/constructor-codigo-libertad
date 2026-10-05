@@ -57,7 +57,7 @@ Deno.serve(async (req) => {
       const n = Number(body.num_slides) || 8;
       const tipo = !body.tipo || body.tipo === "auto" ? "elige el tipo que mejor encaje con la idea" : body.tipo;
       const tono = !body.tono || body.tono === "auto" ? "el de la marca" : `${body.tono}, sin perder la voz de la marca`;
-      const out = await generateJson(ctx.provider, {
+      const out = await generateJson(ctx.user.id, ctx.model, {
         schemaName: "carrusel",
         schema: CARRUSEL_SCHEMA,
         system: SYSTEM,
@@ -74,7 +74,7 @@ Deno.serve(async (req) => {
 
     if (body.action === "modelar") {
       if (!String(body.contenido ?? "").trim()) return json({ error: "Pega el carrusel que quieres modelar." }, 400);
-      const out = await generateJson(ctx.provider, {
+      const out = await generateJson(ctx.user.id, ctx.model, {
         schemaName: "carrusel",
         schema: CARRUSEL_SCHEMA,
         system: SYSTEM,
@@ -91,7 +91,7 @@ Deno.serve(async (req) => {
 
     if (body.action === "adaptar_hook") {
       if (!String(body.hook ?? "").trim()) return json({ error: "Falta el hook." }, 400);
-      const out = await generateJson(ctx.provider, {
+      const out = await generateJson(ctx.user.id, ctx.model, {
         schemaName: "hook",
         schema: HOOK_SCHEMA,
         system: SYSTEM,

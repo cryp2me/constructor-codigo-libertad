@@ -36,7 +36,7 @@ Deno.serve(async (req) => {
     if (body.action === "voz") {
       const ejemplos = Array.isArray(body.ejemplos) ? body.ejemplos.join("\n---\n") : String(body.ejemplos ?? "");
       if (!ejemplos.trim()) return json({ error: "Pega al menos un texto tuyo." }, 400);
-      const out = await generateJson(ctx.provider, {
+      const out = await generateJson(ctx.user.id, ctx.model, {
         schemaName: "voz_marca",
         schema: VOZ_SCHEMA,
         system: BASE,
@@ -55,7 +55,7 @@ Deno.serve(async (req) => {
     if (body.action === "cliente_ideal") {
       const notas = String(body.notas ?? "");
       if (!notas.trim()) return json({ error: "Escribe unas notas sobre tu cliente." }, 400);
-      const out = await generateJson(ctx.provider, {
+      const out = await generateJson(ctx.user.id, ctx.model, {
         schemaName: "cliente_ideal",
         schema: CLIENTE_SCHEMA,
         system: BASE,
