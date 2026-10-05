@@ -11,7 +11,7 @@ import {
   Tag as TagIcon,
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/client";
 
 const TIPOS_RECURSO = [
   {
@@ -245,7 +245,7 @@ export default function Biblioteca() {
     [f, p] = useState(null),
     m = () => {
       (r(true),
-        base44.entities.Resource.list(`-updated_date`, 200)
+        api.entities.Resource.list(`-updated_date`, 200)
           .then(t)
           .finally(() => r(false)));
     };
@@ -280,8 +280,8 @@ export default function Biblioteca() {
     y = async (e) => {
       try {
         (f
-          ? await base44.entities.Resource.update(f.id, e)
-          : await base44.entities.Resource.create({
+          ? await api.entities.Resource.update(f.id, e)
+          : await api.entities.Resource.create({
               ...e,
               es_del_sistema: false,
             }),
@@ -293,7 +293,7 @@ export default function Biblioteca() {
     },
     b = async (e) => {
       try {
-        (await base44.entities.Resource.create({
+        (await api.entities.Resource.create({
           titulo: e.titulo + ` (copia)`,
           tipo: e.tipo,
           contenido: e.contenido,
@@ -310,14 +310,14 @@ export default function Biblioteca() {
     x = async (e) => {
       if (confirm(`¿Borrar este recurso?`))
         try {
-          (await base44.entities.Resource.delete(e.id), m());
+          (await api.entities.Resource.delete(e.id), m());
         } catch {
           alert(`No se pudo borrar.`);
         }
     },
     S = async (e) => {
       try {
-        (await base44.entities.Resource.update(e.id, {
+        (await api.entities.Resource.update(e.id, {
           favorito: !e.favorito,
         }),
           m());

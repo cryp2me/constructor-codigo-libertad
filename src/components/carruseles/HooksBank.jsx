@@ -4,7 +4,7 @@ import {
   Target as TargetIcon,
 } from "lucide-react";
 import { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/client";
 import { AiButton } from "@/components/AiButton";
 import { HOOKS, HOOK_CATEGORIAS } from "@/components/carruseles/hooks-data";
 import { useToast } from "@/components/ui/use-toast";
@@ -51,7 +51,7 @@ function HookCard({ hook: e }) {
             onClick={async () => {
               a(true);
               try {
-                let t = await base44.functions.invoke(`aiCarrusel`, {
+                let t = await api.functions.invoke(`aiCarrusel`, {
                   action: `adaptar_hook`,
                   hook: e.texto,
                   categoria: e.categoria,

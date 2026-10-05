@@ -5,7 +5,7 @@ import {
   Trash2 as Trash2Icon,
 } from "lucide-react";
 import { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/client";
 
 export function FileUploader({ value: e = [], onChange: t }) {
   let [n, r] = useState(false),
@@ -17,7 +17,7 @@ export function FileUploader({ value: e = [], onChange: t }) {
           let n = [];
           for (let e of i) {
             let { file_uri: t } =
-              await base44.integrations.Core.UploadPrivateFile({
+              await api.integrations.Core.UploadPrivateFile({
                 file: e,
               });
             n.push({

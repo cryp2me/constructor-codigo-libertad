@@ -8,8 +8,9 @@ import {
   Trash2 as Trash2Icon,
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/client";
 import { useAuth } from "@/lib/AuthContext";
+import AiProviderSetting from "@/components/AiProviderSetting";
 import { STEPS } from "@/lib/steps";
 
 const MESES = [
@@ -46,10 +47,10 @@ export default function Ajustes() {
     [u, d] = useState(null),
     [f, p] = useState(false),
     m = () => {
-      base44.entities.MonthlyArchive.list(`-created_date`, 10).then(l);
+      api.entities.MonthlyArchive.list(`-created_date`, 10).then(l);
     };
   useEffect(() => {
-    (base44.entities.BrandProfile.list().then((e) => {
+    (api.entities.BrandProfile.list().then((e) => {
       e[0] && (a(e[0].id), r(e[0].enlace_drive || ``));
     }),
       m());
@@ -57,11 +58,11 @@ export default function Ajustes() {
   let h = async () => {
       try {
         if (i)
-          await base44.entities.BrandProfile.update(i, {
+          await api.entities.BrandProfile.update(i, {
             enlace_drive: n,
           });
         else {
-          let e = await base44.entities.BrandProfile.create({
+          let e = await api.entities.BrandProfile.create({
             enlace_drive: n,
           });
           a(e.id);
@@ -95,8 +96,8 @@ export default function Ajustes() {
         p(true);
         try {
           let [e, n] = await Promise.all([
-              base44.entities.StepProgress.list(),
-              base44.entities.ContentPiece.list(),
+              api.entities.StepProgress.list(),
+              api.entities.ContentPiece.list(),
             ]),
             r = STEPS.map((t) => {
               let n = e.find((e) => e.paso === t.num),
@@ -113,7 +114,7 @@ export default function Ajustes() {
           (n.forEach((e) => {
             i[e.estado || `idea`] = (i[e.estado || `idea`] || 0) + 1;
           }),
-            await base44.entities.MonthlyArchive.create({
+            await api.entities.MonthlyArchive.create({
               mes: t,
               archivado_el: new Date().toISOString().slice(0, 10),
               resumen: {
@@ -126,7 +127,7 @@ export default function Ajustes() {
             confirm(
               `Mes archivado ✓ ¿Quieres desmarcar también los checklists para empezar el mes nuevo?`,
             ) &&
-              (await base44.entities.StepProgress.updateMany(
+              (await api.entities.StepProgress.updateMany(
                 {},
                 {
                   $set: {
@@ -150,7 +151,7 @@ export default function Ajustes() {
         )
       )
         try {
-          (await base44.entities.MonthlyArchive.delete(e.id), m());
+          (await api.entities.MonthlyArchive.delete(e.id), m());
         } catch {
           alert(`No se pudo borrar.`);
         }
@@ -194,6 +195,7 @@ export default function Ajustes() {
           {" Cerrar sesión"}
         </button>
       </section>
+      <AiProviderSetting />
       <section className="mt-5 rounded-2xl border border-border bg-card p-6">
         <h2 className="font-heading text-lg font-semibold">
           Carpeta de Google Drive

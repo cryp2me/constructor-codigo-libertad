@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { supabase } from "@/api/client";
 import { useAuth } from "@/lib/AuthContext";
 import { AuthShell, FormError, buttonClass, fieldClass, returnTo } from "@/components/auth/AuthShell";
 
@@ -17,7 +17,8 @@ export default function Login() {
     setError("");
     setLoading(true);
     try {
-      await base44.auth.loginViaEmailPassword(email, password);
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
       await checkUserAuth();
       navigate(returnTo(), { replace: true });
     } catch (err) {
@@ -54,7 +55,12 @@ export default function Login() {
         </button>
         <button
           type="button"
-          onClick={() => base44.auth.loginWithProvider("google", returnTo())}
+          onClick={() =>
+            supabase.auth.signInWithOAuth({
+              provider: "google",
+              options: { redirectTo: window.location.origin + returnTo() },
+            })
+          }
           className="flex w-full items-center justify-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-medium hover:bg-secondary"
         >
           Continuar con Google

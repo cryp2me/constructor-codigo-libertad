@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { useState, useCallback, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/client";
 import { notifyProgressUpdated } from "@/hooks/useProgress";
 import { getStep, STEPS } from "@/lib/steps";
 
@@ -33,12 +33,12 @@ export function StepLayout({ stepNum: e, children: t }) {
     [s, c] = useState(false),
     l = useCallback(async () => {
       try {
-        let t = await base44.entities.StepProgress.filter({
+        let t = await api.entities.StepProgress.filter({
           paso: e,
         });
         if (t.length > 0) i(t[0]);
         else {
-          let t = await base44.entities.StepProgress.create({
+          let t = await api.entities.StepProgress.create({
             paso: e,
             tareas_completadas: [],
             completado: false,
@@ -61,7 +61,7 @@ export function StepLayout({ stepNum: e, children: t }) {
         a = t.includes(e) ? t.filter((t) => t !== e) : [...t, e],
         o = a.length >= n.checklist.length;
       try {
-        let e = await base44.entities.StepProgress.update(r.id, {
+        let e = await api.entities.StepProgress.update(r.id, {
           tareas_completadas: a,
           completado: o,
         });
@@ -227,7 +227,7 @@ export function StepLayout({ stepNum: e, children: t }) {
           if (!t) return;
           let n = prompt(`Contenido de la nota:`) || ``;
           try {
-            (await base44.entities.Resource.create({
+            (await api.entities.Resource.create({
               titulo: t,
               tipo: `nota`,
               contenido: n,

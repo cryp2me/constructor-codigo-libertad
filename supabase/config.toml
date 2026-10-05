@@ -1,0 +1,8 @@
+# Configuración mínima para `supabase link` / `supabase functions deploy`.
+project_id = "constructor-cvm"
+
+[functions.aiMarca]
+verify_jwt = true
+
+[functions.aiCarrusel]
+verify_jwt = true

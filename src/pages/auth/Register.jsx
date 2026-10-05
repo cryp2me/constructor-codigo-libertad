@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { supabase } from "@/api/client";
 import { useAuth } from "@/lib/AuthContext";
 import { AuthShell, FormError, buttonClass, fieldClass } from "@/components/auth/AuthShell";
 
@@ -19,7 +19,8 @@ export default function Register() {
     setError("");
     setLoading(true);
     try {
-      await base44.auth.register({ email, password });
+      const { error } = await supabase.auth.signUp({ email, password });
+      if (error) throw error;
       setNeedsOtp(true);
     } catch (err) {
       setError(err?.message || "No se ha podido crear la cuenta");
@@ -33,8 +34,8 @@ export default function Register() {
     setError("");
     setLoading(true);
     try {
-      await base44.auth.verifyOtp({ email, otpCode: otp });
-      await base44.auth.loginViaEmailPassword(email, password);
+      const { error } = await supabase.auth.verifyOtp({ email, token: otp, type: "signup" });
+      if (error) throw error;
       await checkUserAuth();
       navigate("/", { replace: true });
     } catch (err) {

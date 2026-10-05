@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/client";
 import { AiButton } from "@/components/AiButton";
 import { CarouselResult } from "@/components/carruseles/CarouselResult";
 
@@ -25,7 +25,7 @@ export function OptimizarCarrusel() {
       if (!(!e.contenido.trim() || n)) {
         (r(true), a(null), l(null), p(false), v(false));
         try {
-          let t = await base44.functions.invoke(`aiCarrusel`, {
+          let t = await api.functions.invoke(`aiCarrusel`, {
             action: `modelar`,
             contenido: e.contenido,
             objetivo: e.objetivo,
@@ -90,7 +90,7 @@ export function OptimizarCarrusel() {
         onSave={async () => {
           s(true);
           try {
-            let t = await base44.entities.ContentPiece.create({
+            let t = await api.entities.ContentPiece.create({
               hook: i.hook,
               guion_modelado: x(i),
               caption: i.caption,
@@ -114,7 +114,7 @@ export function OptimizarCarrusel() {
         onGuardarBiblioteca={async () => {
           d(true);
           try {
-            (await base44.entities.Resource.create({
+            (await api.entities.Resource.create({
               titulo: `Carrusel modelado: ${i.hook}`.slice(0, 80),
               tipo: `plantilla`,
               contenido:
@@ -137,7 +137,7 @@ export function OptimizarCarrusel() {
         onDrive={async (e, t) => {
           h(true);
           try {
-            (await base44.entities.ContentPiece.update(c.id, {
+            (await api.entities.ContentPiece.update(c.id, {
               enlace_drive: e.trim(),
               estado: `subido a Drive`,
             }),

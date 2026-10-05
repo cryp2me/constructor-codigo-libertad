@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { api, supabase } from "@/api/client";
 
 const AuthContext = createContext(null);
 
@@ -8,9 +8,8 @@ export function AuthProvider({ children }) {
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
 
   const checkUserAuth = useCallback(async () => {
-    setIsLoadingAuth(true);
     try {
-      setUser(await base44.auth.me());
+      setUser(await api.auth.me());
     } catch {
       setUser(null);
     } finally {
@@ -20,11 +19,13 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     checkUserAuth();
+    const { data } = supabase.auth.onAuthStateChange(() => checkUserAuth());
+    return () => data.subscription.unsubscribe();
   }, [checkUserAuth]);
 
   const logout = () => {
     setUser(null);
-    base44.auth.logout("/login");
+    api.auth.logout("/login");
   };
 
   return (

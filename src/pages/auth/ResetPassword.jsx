@@ -1,16 +1,25 @@
-import { useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "@/api/client";
 import { AuthShell, FormError, buttonClass, fieldClass } from "@/components/auth/AuthShell";
 
+// Se llega aquí desde el enlace del email de recuperación: supabase-js
+// detecta el token en la URL y abre una sesión temporal de recuperación.
 export default function ResetPassword() {
   const navigate = useNavigate();
-  const [params] = useSearchParams();
-  const resetToken = params.get("token") || params.get("reset_token") || "";
+  const [ready, setReady] = useState(false);
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setReady(!!data.session));
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY" || session) setReady(true);
+    });
+    return () => data.subscription.unsubscribe();
+  }, []);
 
   const submit = async (e) => {
     e.preventDefault();
@@ -18,8 +27,9 @@ export default function ResetPassword() {
     setError("");
     setLoading(true);
     try {
-      await base44.auth.resetPassword({ resetToken, newPassword: password });
-      navigate("/login", { replace: true });
+      const { error } = await supabase.auth.updateUser({ password });
+      if (error) throw error;
+      navigate("/", { replace: true });
     } catch (err) {
       setError(err?.message || "El enlace no es válido o ha caducado");
     } finally {
@@ -39,8 +49,8 @@ export default function ResetPassword() {
       <form onSubmit={submit} className="space-y-4">
         <input type="password" required minLength={8} placeholder="Nueva contraseña" className={fieldClass} value={password} onChange={(e) => setPassword(e.target.value)} />
         <input type="password" required minLength={8} placeholder="Repite la contraseña" className={fieldClass} value={confirm} onChange={(e) => setConfirm(e.target.value)} />
-        <FormError>{error || (!resetToken && "Falta el token del enlace")}</FormError>
-        <button type="submit" disabled={loading || !resetToken} className={buttonClass}>
+        <FormError>{error || (!ready && "Abre esta página desde el enlace del email de recuperación")}</FormError>
+        <button type="submit" disabled={loading || !ready} className={buttonClass}>
           {loading ? "Guardando…" : "Guardar contraseña"}
         </button>
       </form>

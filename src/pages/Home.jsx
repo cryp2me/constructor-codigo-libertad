@@ -5,7 +5,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/client";
 import { useProgress } from "@/hooks/useProgress";
 import { useAuth } from "@/lib/AuthContext";
 import { FORMATOS, ESTADOS } from "@/lib/constants";
@@ -77,8 +77,8 @@ export default function Home() {
     [l, u] = useState(true);
   useEffect(() => {
     Promise.all([
-      base44.entities.ContentPiece.list().catch(() => []),
-      base44.entities.BrandProfile.list().catch(() => []),
+      api.entities.ContentPiece.list().catch(() => []),
+      api.entities.BrandProfile.list().catch(() => []),
     ]).then(([e, t]) => {
       (o(e), c(t[0] || null), u(false));
     });

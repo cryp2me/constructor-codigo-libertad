@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/client";
 import { TOTAL_TASKS, STEPS } from "@/lib/steps";
 
 export function useProgress() {
@@ -12,7 +12,7 @@ export function useProgress() {
     }),
     n = useCallback(async () => {
       try {
-        let e = await base44.entities.StepProgress.list(),
+        let e = await api.entities.StepProgress.list(),
           n = 0,
           r = {};
         (STEPS.forEach((t) => {

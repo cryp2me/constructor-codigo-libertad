@@ -5,7 +5,7 @@ import {
   Save as SaveIcon,
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/client";
 import { AiButton } from "@/components/AiButton";
 import { FileUploader } from "@/components/forms/FileUploader";
 import { ListField } from "@/components/forms/ListField";
@@ -85,7 +85,7 @@ export default function Marca() {
         [e]: t,
       }));
   useEffect(() => {
-    base44.entities.BrandProfile.list()
+    api.entities.BrandProfile.list()
       .then((e) => {
         e[0] &&
           (i(e[0].id),
@@ -99,9 +99,9 @@ export default function Marca() {
   let x = async () => {
       c(true);
       try {
-        if (r) await base44.entities.BrandProfile.update(r, t);
+        if (r) await api.entities.BrandProfile.update(r, t);
         else {
-          let e = await base44.entities.BrandProfile.create(t);
+          let e = await api.entities.BrandProfile.create(t);
           i(e.id);
         }
         alert(`Marca guardada ✓`);
@@ -122,7 +122,7 @@ export default function Marca() {
     C = async () => {
       m(true);
       try {
-        let e = await base44.functions.invoke(`aiMarca`, {
+        let e = await api.functions.invoke(`aiMarca`, {
             action: `voz`,
             ejemplos: h,
           }),
@@ -148,7 +148,7 @@ export default function Marca() {
     w = async () => {
       m(true);
       try {
-        let e = await base44.functions.invoke(`aiMarca`, {
+        let e = await api.functions.invoke(`aiMarca`, {
             action: `cliente_ideal`,
             notas: v,
           }),
